@@ -64,7 +64,7 @@ int MasterMindApi::checkAndReturnState( int& newRow, int feedback[ ROW_SIZE ] )
     return my_ret;
 }
 
-void MasterMindApi::getHiddenCode( ColorCodes hidden_code[ ROW_SIZE ] )
+void MasterMindApi::getHiddenCode( ColorCodes hidden_code[ ROW_SIZE ] ) const
 {
     for ( int i = 0; i < ROW_SIZE; i++ )
     {
@@ -72,7 +72,42 @@ void MasterMindApi::getHiddenCode( ColorCodes hidden_code[ ROW_SIZE ] )
     }
 }
 
+int MasterMindApi::getCurrentRow( ) const
+{
+    return m_currentRow;
+}
+
 void MasterMindApi::RestartGame( )
 {
     InitData( );
+}
+
+//----private methods
+int MasterMindApi::putColor( ColorCodes colorCode, int row, int col )
+{
+    if ( colorCode < COLOR_FIRST || colorCode >= NUMBER_OF_COLORS )
+        return -1;
+    if ( row < 0 || row >= NUMBER_OF_ROWS || col < 0 || col >= ROW_SIZE )
+        return -2;
+    m_PlayGrate[ row ][ col ] = colorCode;
+    return 1;
+}
+
+void MasterMindApi::InitData( )
+{
+    m_currentRow = 0;
+    //make a new hidden code to be broken
+    for ( int i = 0; i < ROW_SIZE; i++ )
+    {
+        m_HiddenCode[ i ] = (ColorCodes)( rand( ) % ( (int)(NUMBER_OF_COLORS)-1 ) );
+    }
+
+    for ( int i = 0; i < NUMBER_OF_ROWS; i++ )
+    {
+        for ( int j = 0; j < ROW_SIZE; j++ )
+        {
+            m_PlayGrate[ i ][ j ] = ColorCodes::NO_COLOR;
+            m_FeedbackPegs[ i ][ j ] = NO_VALUE;
+        }
+    }
 }

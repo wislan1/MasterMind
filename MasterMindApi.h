@@ -56,7 +56,7 @@ public:
     //---value in a pegs feedback aray
 
 public:
-    //constructor
+    //default constructor
     MasterMindApi( );
 
     int putColorInCurrentRow( ColorCodes colorCode, int col );
@@ -78,12 +78,9 @@ public:
  * @param out "hidden_code" - array of ROW_SIZE size that contains the numbers of color code to be guessed
  *
  */
-    void getHiddenCode( ColorCodes hidden_code[ ROW_SIZE ] ); const
+    void getHiddenCode( ColorCodes hidden_code[ ROW_SIZE ] ) const;
 
-    int getCurrentRow( ) const
-    {
-        return m_currentRow;
-    }
+    inline int getCurrentRow( ) const;
 
     void RestartGame( );
 
@@ -96,6 +93,7 @@ private:
             m_FeedbackPegs[ m_currentRow ][ i ] = NO_VALUE;
         }
 
+        // loop through the current row and ind out if there are any not selected fields/ the same time count exact maches
         int number_of_exact_matches = 0;
         for ( int i = 0; i < ROW_SIZE; i++ )
         {
@@ -110,7 +108,7 @@ private:
                 number_of_exact_matches++;
             }
         }
-        //all colors matched excactly
+        //all colors at all positions matched excactly
         if ( number_of_exact_matches == ROW_SIZE )
             return 2;
 
@@ -134,38 +132,12 @@ private:
         return 1;
     }
 
-    int putColor( ColorCodes colorCode, int row, int col )
-    {
-        if ( colorCode < COLOR_FIRST || colorCode >= NUMBER_OF_COLORS )
-            return -1;
-        if ( row < 0 || row >= NUMBER_OF_ROWS || col < 0 || col >= ROW_SIZE )
-            return -2;
-        m_PlayGrate[ row ][ col ] = colorCode;
-        return 1;
-    }
-
-    void InitData( )
-    {
-        m_currentRow = 0;
-        //make a new hidden code to be broken
-        for (int i=0; i<ROW_SIZE; i++ )
-        {
-            m_HiddenCode[ i ] = (ColorCodes)(rand( ) % ((int)(NUMBER_OF_COLORS)-1));
-        }
-
-        for ( int i = 0; i < NUMBER_OF_ROWS; i++ )
-        {
-            for ( int j = 0; j < ROW_SIZE; j++ )
-            {
-                m_PlayGrate[ i ][ j ] = ColorCodes::NO_COLOR;
-                m_FeedbackPegs[ i ][ j ] = NO_VALUE;
-            }
-        }
-    }
+    int putColor( ColorCodes colorCode, int row, int col );
+    void InitData( );
 
 private:
     static const ColorCodes NUMBER_OF_COLORS = ColorCodes::NO_COLOR;
-    static const ColorCodes COLOR_FIRST = ColorCodes::COLOR_RED;      //make sure this is alwais first entry from the ColorCodes class
+    static const ColorCodes COLOR_FIRST = ColorCodes::COLOR_RED;      //make sure this is always first entry in the ColorCodes class
     ColorCodes m_HiddenCode[ ROW_SIZE ];
     ColorCodes m_PlayGrate[ NUMBER_OF_ROWS][ ROW_SIZE ];
     int m_FeedbackPegs[ NUMBER_OF_ROWS ][ ROW_SIZE ];
