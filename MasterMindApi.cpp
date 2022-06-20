@@ -83,6 +83,54 @@ void MasterMindApi::RestartGame( )
 }
 
 //----private methods
+int MasterMindApi::evaluateCurrentState( )
+{
+    //reset the pegs feedback array
+    for ( int i = 0; i < ROW_SIZE; i++ )
+    {
+        m_FeedbackPegs[ m_currentRow ][ i ] = NO_VALUE;
+    }
+
+    // loop through the current row and ind out if there are any not selected fields/ the same time count exact maches
+    int number_of_exact_matches = 0;
+    for ( int i = 0; i < ROW_SIZE; i++ )
+    {
+        if ( m_PlayGrate[ m_currentRow ][ i ] == ColorCodes::NO_COLOR )
+        {
+            debug( "pos: ", i, ", in row: ", m_currentRow, " is not filled in\n" );
+            return -1;
+        }
+        if ( m_PlayGrate[ m_currentRow ][ i ] == m_HiddenCode[ i ] )
+        {
+            m_FeedbackPegs[ m_currentRow ][ i ] = EXACT_MATCH;
+            number_of_exact_matches++;
+        }
+    }
+    //all colors at all positions matched excactly
+    if ( number_of_exact_matches == ROW_SIZE )
+        return 2;
+
+    //find remaining, not exact matches
+    for ( int i = 0; i < ROW_SIZE; i++ )
+    {
+        if ( m_FeedbackPegs[ m_currentRow ][ i ] == EXACT_MATCH )
+            continue;
+
+        for ( int j = 0; j < ROW_SIZE; j++ )
+        {
+            if ( i == j || m_FeedbackPegs[ m_currentRow ][ j ] == EXACT_MATCH )
+                continue;
+
+            if ( m_PlayGrate[ m_currentRow ][ i ] == m_HiddenCode[ j ] )
+            {
+                m_FeedbackPegs[ m_currentRow ][ i ] = PARTIAL_MATCH;
+                break;
+            }
+        }
+    }
+    return 1;
+}
+
 int MasterMindApi::putColor( ColorCodes colorCode, int row, int col )
 {
     if ( colorCode < COLOR_FIRST || colorCode >= NUMBER_OF_COLORS )

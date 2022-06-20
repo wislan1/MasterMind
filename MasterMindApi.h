@@ -49,11 +49,11 @@ public:
     static const int ROW_SIZE = 4;
     static const int NUMBER_OF_ROWS = 10;
     //---sizes of play field
-    //---value in a pegs feedback aray
+    //---possible values in a pegs feedback aray
     static const int EXACT_MATCH = 2;    //field matched exactly according to the color and positon
     static const int PARTIAL_MATCH = 1;  //field matched only according to the color but ot positon
     static const int NO_VALUE = -1;      //field value after initialisation
-    //---value in a pegs feedback aray
+    //---possible values in a pegs feedback aray
 
 public:
     //default constructor
@@ -76,64 +76,22 @@ public:
  * @brief gets array with hidden code
  * 
  * @param out "hidden_code" - array of ROW_SIZE size that contains the numbers of color code to be guessed
- *
  */
     void getHiddenCode( ColorCodes hidden_code[ ROW_SIZE ] ) const;
-
     inline int getCurrentRow( ) const;
-
     void RestartGame( );
 
 private:
-    int evaluateCurrentState( )
-    {
-        //reset the pegs feedback array
-        for ( int i = 0; i < ROW_SIZE; i++ )
-        {
-            m_FeedbackPegs[ m_currentRow ][ i ] = NO_VALUE;
-        }
-
-        // loop through the current row and ind out if there are any not selected fields/ the same time count exact maches
-        int number_of_exact_matches = 0;
-        for ( int i = 0; i < ROW_SIZE; i++ )
-        {
-            if ( m_PlayGrate[ m_currentRow ][ i ] == ColorCodes::NO_COLOR )
-            {
-                debug( "pos: ", i, ", in row: ", m_currentRow, " is not filled in\n" );
-                return -1;
-            }
-            if ( m_PlayGrate[ m_currentRow ][ i ] == m_HiddenCode[ i ] )
-            {
-                m_FeedbackPegs[ m_currentRow ][ i ] = EXACT_MATCH;
-                number_of_exact_matches++;
-            }
-        }
-        //all colors at all positions matched excactly
-        if ( number_of_exact_matches == ROW_SIZE )
-            return 2;
-
-        //find remaining, not exact matches
-        for ( int i = 0; i < ROW_SIZE; i++ )
-        {
-            if ( m_FeedbackPegs[ m_currentRow ][ i ] == EXACT_MATCH )
-                continue;
-
-            for ( int j = 0; j < ROW_SIZE; j++ )
-            {
-                if ( i == j || m_FeedbackPegs[ m_currentRow ][ j ] == EXACT_MATCH )
-                    continue;
-
-                if ( m_PlayGrate[ m_currentRow ][ i ] == m_HiddenCode[ j ] )
-                {
-                    m_FeedbackPegs[ m_currentRow ][ i ] = PARTIAL_MATCH;
-                }
-            }
-        }
-        return 1;
-    }
-
+    /*
+     * @brief Based on the m_PlayGrate[m_currentRow][...] choises and m_HiddenCode[...] values, the function files in the m_FeedbackPegs array
+     *
+     * @return "-1" - when some of the positions in m_PlayGrate[m_currentRow][i] is not yet choosen
+     *         " 2" - when there is BINGO, whole hidden code has been guessed
+     *         " 1" - when there is at least one not EXACT_MATCH, which may be either (PARTIAL_MATCH or NO_VALUE)
+     */
+    int evaluateCurrentState();
     int putColor( ColorCodes colorCode, int row, int col );
-    void InitData( );
+    void InitData();
 
 private:
     static const ColorCodes NUMBER_OF_COLORS = ColorCodes::NO_COLOR;
@@ -143,4 +101,3 @@ private:
     int m_FeedbackPegs[ NUMBER_OF_ROWS ][ ROW_SIZE ];
     int m_currentRow = 0;
 };
-
